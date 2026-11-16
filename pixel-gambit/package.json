@@ -1,0 +1,15 @@
+{
+  "name": "pixel-gambit",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test regression.test.mjs",
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "stockfish": "19.0.1"
+  }
+}

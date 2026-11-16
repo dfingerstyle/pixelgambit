@@ -1,0 +1,9 @@
+node_modules/
+dist/
+vendor/
+.netlify/
+.env
+.env.*
+!.env.example
+*.log
+tools/node_modules/

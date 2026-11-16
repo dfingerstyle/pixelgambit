@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-11-16",
+  "supabaseProject": "elnpfsaquusnwowejrxe",
+  "publication": { "local": "build passed", "preview": "unverified; none published this session", "production": "unverified; none published this session", "git": "project is not a Git repository" },
+  "verification": {
+    "automated": "npm test: 7 passed, 0 failed; chess perft, en passant, promotion, mate, mocked Stockfish legal-result validation/worker cleanup, live HTTP path security",
+    "build": "npm run build passed",
+    "browser": "World inspected on existing port 4173; updated server Chess Hub loaded on 4174. No full gameplay, mobile or visual-layout validation yet.",
+    "database": "Connector URL verified; public profiles and saves both have RLS enabled. Policy semantics not yet audited. No database changes.",
+    "connectors": "Supabase database reads succeeded. GitHub and Netlify tool inventories discovered; authentication and publication state not tested. CLI availability is independent."
+  },
+  "milestones": [
+    { "id": 1, "name": "Baseline and regression protection", "status": "partial", "completed": ["Existing build verified", "Development server malformed URL and path-boundary handling fixed", "Seven automated regressions added"], "remaining": ["Automated browser gameplay coverage", "World, inventory, properties and casino regressions", "Real Stockfish worker and stale-position browser tests", "Asset and Stockfish source/license audit"] },
+    { "id": 2, "name": "Server-backed social foundation", "status": "not verified", "remaining": ["Policy audit", "Secure player discovery and profiles", "Friend requests and acceptance/rejection", "Presence and invitations"] },
+    { "id": 3, "name": "Messaging and notifications", "status": "not verified" },
+    { "id": 4, "name": "Shared platform authority", "status": "prototype only; authority not verified" },
+    { "id": 5, "name": "Real staff system", "status": "not verified; local testing must remain separate" },
+    { "id": 6, "name": "Chess Hub", "status": "partial; local engine tests pass, synchronized online modes not verified" },
+    { "id": 7, "name": "Casino betting and animation polish", "status": "existing implementation needs regression verification" },
+    { "id": 8, "name": "Multiplayer casino", "status": "not verified" },
+    { "id": 9, "name": "Deeper customization and properties", "status": "existing implementation needs regression verification" },
+    { "id": 10, "name": "Progression and live content", "status": "not verified" },
+    { "id": 11, "name": "Launch and ongoing updates", "status": "not ready for verified launch" }
+  ],
+  "blockers": [
+    "Supabase security advisor: public.touch_save mutable search_path; inspect function definition before changing it",
+    "Supabase security advisor: leaked password protection disabled; availability/cost and Auth configuration require review",
+    "Comprehensive browser tests and backend authorization tests absent",
+    "Publication contents and licenses not yet reviewed"
+  ],
+  "next": "Finish baseline browser/gameplay regressions and audit existing Supabase policies before implementing secure player discovery and friend requests."
+}

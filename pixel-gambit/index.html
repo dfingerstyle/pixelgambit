@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="starry">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PIXEL GAMBIT — a living pixel world of chess &amp; casino</title>
+<meta name="description" content="Walk a living pixel town: real chess, a dramatic virtual-coin casino, and a shared economy. No accounts required, no real money, no paywalls." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/casino.css" />
+<link rel="stylesheet" href="css/modern.css" />
+<link rel="stylesheet" href="css/interiors.css" />
+<link rel="stylesheet" href="css/cosmetics.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>" />
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#world" data-view-link="world">
+    <span class="brand-piece" id="brand-piece"></span>
+    <span class="brand-name">PIXEL<em>GAMBIT</em></span>
+  </a>
+  <nav class="nav-links" aria-label="Views">
+    <a href="#world" data-view-link="world" class="active">WORLD</a>
+    <a href="#play" data-view-link="play">CHESS</a>
+    <a href="#casino" data-view-link="casino">CASINO</a>
+    <a href="#economy" data-view-link="economy">ECONOMY</a>
+  </nav>
+  <div class="nav-tools">
+    <div class="theme-picker" role="group" aria-label="Sky theme">
+      <button class="theme-dot starry" data-theme-choice="starry" aria-label="Starry Void theme" title="Starry Void"></button>
+      <button class="theme-dot sakura" data-theme-choice="sakura" aria-label="Sakura theme" title="Sakura"></button>
+      <button class="theme-dot sea" data-theme-choice="sea" aria-label="Deep Sea theme" title="Deep Sea"></button>
+    </div>
+    <button id="sound-toggle" class="sound-toggle" aria-pressed="true" aria-label="Toggle all sound">
+      <span class="sound-on">SOUND ON</span><span class="sound-off">MUTED</span>
+    </button>
+    <button id="settings-btn" class="icon-btn" aria-label="Open settings" title="Settings">⚙</button>
+    <button id="profile-chip" class="profile-chip" aria-label="Open player profile">
+      <span class="chip-avatar" id="chip-avatar"></span>
+      <span class="chip-meta"><strong id="chip-name">Guest</strong><small id="chip-wallet">1,000 ◉</small></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ WORLD (home) ============ -->
+  <section class="view view-world active" id="view-world" aria-label="Gambit Town">
+    <canvas id="world-canvas"></canvas>
+    <div class="world-hud">
+      <span class="world-location">GAMBIT TOWN · MAIN STREET</span>
+      <span class="world-hint">A / D move · SPACE jump · E enter · tap to walk</span>
+    </div>
+    <button id="door-prompt" class="door-prompt" hidden></button>
+    <div class="touch-controls" id="touch-controls" aria-label="Movement controls">
+      <button id="tc-left" aria-label="Walk left">◀</button>
+      <button id="tc-right" aria-label="Walk right">▶</button>
+      <button id="tc-jump" aria-label="Jump">⤒</button>
+    </div>
+  </section>
+
+  <!-- ============ CHESS ============ -->
+  <section class="view" id="view-play">
+    <div class="view-head">
+      <button class="back-btn" data-view-link="world">← WORLD</button>
+      <div>
+        <h1>Chess Hub</h1>
+        <p>Full rules — castling, en passant, promotion, checkmate, draws. CPU temperaments, pass-and-play, clocks and a board workshop.</p>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <div class="board-column">
+        <div class="player-bar top-bar">
+          <span class="player-tag" id="top-player">♜ CPU · STANDARD</span>
+          <span class="bar-right"><span class="captured" id="captured-top"></span><span class="clock" id="clock-top">∞</span></span>
+        </div>
+        <div class="board-frame">
+          <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+          <div id="promo-overlay" class="promo-overlay" hidden>
+            <p>PROMOTE TO</p>
+            <div class="promo-choices" id="promo-choices"></div>
+          </div>
+          <div id="end-overlay" class="end-overlay" hidden>
+            <p class="end-kicker" id="end-kicker">GAME OVER</p>
+            <p class="end-title" id="end-title">CHECKMATE</p>
+            <p class="end-sub" id="end-sub"></p>
+            <button class="btn btn-primary" id="end-restart">PLAY AGAIN <span>↗</span></button>
+          </div>
+        </div>
+        <div class="player-bar bottom-bar">
+          <span class="player-tag" id="bottom-player">♙ YOU</span>
+          <span class="bar-right"><span class="captured" id="captured-bottom"></span><span class="clock" id="clock-bottom">∞</span></span>
+        </div>
+        <p class="game-status" id="game-status" aria-live="polite">Your move.</p>
+      </div>
+
+      <aside class="game-panel">
+        <h3>MATCH CONTROL</h3>
+        <label class="field">
+          <span>OPPONENT</span>
+          <div class="seg" id="mode-seg">
+            <button data-mode="cpu" class="active">CPU</button>
+            <button data-mode="local">2 PLAYERS</button>
+          </div>
+        </label>
+        <label class="field" id="difficulty-field">
+          <span>CPU TEMPERAMENT</span>
+          <select id="difficulty">
+            <option value="chill">Chill · plays loose</option>
+            <option value="standard" selected>Standard · grabs material</option>
+            <option value="ruthless">Ruthless · looks ahead</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>CLOCK</span>
+          <select id="time-control">
+            <option value="0" selected>No clock · relaxed</option>
+            <option value="60">Bullet · 1 min</option>
+            <option value="180">Blitz · 3 min</option>
+            <option value="300">Rapid · 5 min</option>
+            <option value="600">Classical · 10 min</option>
+          </select>
+        </label>
+        <div class="panel-buttons">
+          <button class="btn btn-small" id="undo-btn">↩ UNDO</button>
+          <button class="btn btn-small" id="flip-btn">⇅ FLIP</button>
+          <button class="btn btn-small btn-danger" id="restart-btn">⟳ RESTART</button>
+        </div>
+        <div class="workshop">
+          <h3>BOARD WORKSHOP</h3>
+          <div class="workshop-presets" id="board-presets"></div>
+          <div class="workshop-colors">
+            <label>LIGHT <input type="color" id="board-light" value="#cbb8f0" /></label>
+            <label>DARK <input type="color" id="board-dark" value="#5b3f96" /></label>
+          </div>
+        </div>
+        <div class="movelist-wrap">
+          <h3>MOVES</h3>
+          <ol class="movelist" id="movelist"><li class="movelist-empty">No moves yet. White begins.</li></ol>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ CASINO ============ -->
+  <section class="view casino-section" id="view-casino">
+    <div class="view-head">
+      <button class="back-btn" data-view-link="world">← WORLD</button>
+      <div>
+        <h1>Neon Gambit · Game Tables</h1>
+        <button class="btn" id="casino-return">← CASINO LOUNGE</button>
+        <p>Four games, one shared wallet, published odds, full betting history. No real money — no deposits, no withdrawals, no exceptions.</p>
+      </div>
+    </div>
+
+    <div class="casino-shell">
+      <div class="casino-topbar">
+        <div class="casino-tabs" role="tablist" aria-label="Casino games">
+          <button role="tab" data-game="roulette" class="active" aria-selected="true">◉ ROULETTE</button>
+          <button role="tab" data-game="coinflip" aria-selected="false">◈ COIN FLIP</button>
+          <button role="tab" data-game="dice" aria-selected="false">⚄ DICE</button>
+          <button role="tab" data-game="slots" aria-selected="false">★ SLOTS</button>
+          <button role="tab" data-game="table" aria-selected="false">♟ TABLE</button>
+        </div>
+        <div class="casino-wallet">
+          <span>WALLET</span>
+          <strong id="casino-wallet">1,000</strong>
+          <span class="coin-unit">◉</span>
+          <button id="casino-bailout" class="bailout-chip" hidden>+500</button>
+          <button id="ambience-toggle" class="ambience-toggle" aria-pressed="false" title="Casino ambience">AMBIENCE OFF</button>
+        </div>
+      </div>
+
+      <!-- ROULETTE -->
+      <div class="game-stage" id="stage-roulette">
+        <div class="roulette-layout">
+          <div class="wheel-column">
+            <div class="wheel-wrap">
+              <div class="wheel-pointer">▼</div>
+              <div class="wheel" id="wheel"><div class="wheel-numbers" id="wheel-numbers"></div><div class="wheel-hub">♛</div></div>
+              <div class="ball-track" id="ball-track"><div class="ball"></div></div>
+            </div>
+            <p class="stage-result" id="roulette-result" aria-live="polite">PLACE YOUR BETS</p>
+            <div class="roulette-history" id="roulette-history" aria-label="Recent numbers"></div>
+          </div>
+          <div class="bet-column">
+            <div class="chip-row" id="chip-row" role="group" aria-label="Chip value">
+              <button data-chip="25" class="chip c25">25</button>
+              <button data-chip="100" class="chip c100 active">100</button>
+              <button data-chip="250" class="chip c250">250</button>
+              <button data-chip="1000" class="chip c1000">1K</button>
+            </div>
+            <div class="bet-table" id="bet-table"></div>
+            <div class="bet-actions">
+              <span class="bet-total">BET <strong id="bet-total">0</strong> ◉</span>
+              <button class="btn btn-small" id="clear-bets">CLEAR</button>
+              <button class="btn btn-small" id="rebet">REBET</button>
+              <button class="btn btn-primary" id="spin-btn">SPIN <span>↗</span></button>
+            </div>
+            <p class="odds-note">European wheel · single zero · house edge 2.70% · straight 35:1, dozen/column 2:1, even chances 1:1.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- COIN FLIP -->
+      <div class="game-stage" id="stage-coinflip" hidden>
+        <div class="arcade-layout">
+          <div class="coin-stage">
+            <div class="coin" id="coin" aria-hidden="true">
+              <div class="coin-face coin-heads"></div>
+              <div class="coin-face coin-tails"></div>
+            </div>
+            <p class="coin-result" id="coin-result" aria-live="polite">PLACE YOUR BET</p>
+            <p class="streak-line" id="coin-streak"></p>
+          </div>
+          <div class="arcade-panel">
+            <label class="field">
+              <span>BET</span>
+              <div class="bet-stepper">
+                <button id="bet-minus" aria-label="Decrease bet">−</button>
+                <input id="bet-input" type="number" min="25" step="25" value="100" inputmode="numeric" />
+                <button id="bet-plus" aria-label="Increase bet">+</button>
+              </div>
+              <div class="bet-presets" id="coin-presets">
+                <button data-bet="25">25</button>
+                <button data-bet="100">100</button>
+                <button data-bet="250">250</button>
+                <button data-bet="max">MAX</button>
+                <button data-bet="half">½</button>
+                <button data-bet="double">×2</button>
+                <button data-bet="repeat">REPEAT</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>CALL IT</span>
+              <div class="seg" id="call-seg">
+                <button data-call="heads" class="active">♛ HEADS</button>
+                <button data-call="tails">♞ TAILS</button>
+              </div>
+            </label>
+            <button class="btn btn-primary btn-flip" id="flip-btn-coin">FLIP THE COIN <span>↗</span></button>
+            <p class="odds-note">Fair 50/50 · wins pay 1:1 · no house edge.</p>
+            <div class="flip-history-wrap">
+              <h3>RECENT FLIPS</h3>
+              <ul class="flip-history" id="flip-history"><li class="movelist-empty">The coin awaits its first victim.</li></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DICE -->
+      <div class="game-stage" id="stage-dice" hidden>
+        <div class="arcade-layout">
+          <div class="dice-stage">
+            <div class="dice-scene">
+              <div class="die" id="die">
+                <div class="die-face f1"></div><div class="die-face f2"></div><div class="die-face f3"></div>
+                <div class="die-face f4"></div><div class="die-face f5"></div><div class="die-face f6"></div>
+              </div>
+            </div>
+            <p class="stage-result" id="dice-result" aria-live="polite">ROLL WHEN READY</p>
+          </div>
+          <div class="arcade-panel">
+            <label class="field">
+              <span>BET</span>
+              <div class="bet-stepper">
+                <button id="dice-bet-minus" aria-label="Decrease bet">−</button>
+                <input id="dice-bet" type="number" min="25" step="25" value="100" inputmode="numeric" />
+                <button id="dice-bet-plus" aria-label="Increase bet">+</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>BET TYPE</span>
+              <div class="seg" id="dice-type-seg">
+                <button data-dtype="over" class="active">OVER</button>
+                <button data-dtype="under">UNDER</button>
+                <button data-dtype="exact">EXACT</button>
+                <button data-dtype="parity">ODD/EVEN</button>
+              </div>
+            </label>
+            <label class="field" id="dice-target-field">
+              <span>TARGET · <b id="dice-target-label">roll over 3</b></span>
+              <input type="range" id="dice-target" min="1" max="5" value="3" />
+              <div class="dice-odds"><span id="dice-chance">50.0%</span><span id="dice-payout">pays 1.90×</span></div>
+            </label>
+            <label class="field" id="dice-parity-field" hidden>
+              <span>CALL</span>
+              <div class="seg" id="dice-parity-seg">
+                <button data-parity="odd" class="active">ODD</button>
+                <button data-parity="even">EVEN</button>
+              </div>
+            </label>
+            <button class="btn btn-primary btn-flip" id="roll-btn">ROLL THE DIE <span>↗</span></button>
+            <p class="odds-note">One fair six-sided die · 5% house edge on over/under/exact · odd/even pays 1.90×.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLOTS -->
+      <div class="game-stage" id="stage-slots" hidden>
+        <div class="arcade-layout">
+          <div class="slots-stage">
+            <div class="slot-machine">
+              <div class="slot-marquee">★ PIXEL FORTUNE ★</div>
+              <div class="slot-reels">
+                <div class="reel" id="reel-0"><div class="reel-strip"></div></div>
+                <div class="reel" id="reel-1"><div class="reel-strip"></div></div>
+                <div class="reel" id="reel-2"><div class="reel-strip"></div></div>
+              </div>
+              <div class="slot-line"></div>
+            </div>
+            <p class="stage-result" id="slots-result" aria-live="polite">MATCH THREE TO WIN</p>
+          </div>
+          <div class="arcade-panel">
+            <label class="field">
+              <span>BET PER SPIN</span>
+              <div class="bet-stepper">
+                <button id="slots-bet-minus" aria-label="Decrease bet">−</button>
+                <input id="slots-bet" type="number" min="25" step="25" value="50" inputmode="numeric" />
+                <button id="slots-bet-plus" aria-label="Increase bet">+</button>
+              </div>
+            </label>
+            <button class="btn btn-primary btn-flip" id="slots-spin">SPIN THE REELS <span>↗</span></button>
+            <div class="paytable">
+              <h3>PAYTABLE</h3>
+              <div><span>7 7 7</span><b>50×</b></div>
+              <div><span>♛ ♛ ♛</span><b>20×</b></div>
+              <div><span>♞ ♞ ♞</span><b>10×</b></div>
+              <div><span>◉ ◉ </span><b>6×</b></div>
+              <div><span>★ ★ ★</span><b>4×</b></div>
+              <div><span>♦ ♦ ♦</span><b>3×</b></div>
+              <div><span>any pair</span><b>1.5×</b></div>
+            </div>
+            <p class="odds-note">Weighted reels · theoretical RTP ≈ 93% · virtual coins only.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MULTIPLAYER TABLE (local pass & play) -->
+      <div class="game-stage" id="stage-table" hidden>
+        <div class="table-layout">
+          <div class="table-main">
+            <div class="table-head">
+              <h3>PASS &amp; PLAY TABLE</h3>
+              <p class="odds-note">One device, up to four players, one shared wheel. Each seat keeps its own balance. This is a local table — no server, no strangers.</p>
+            </div>
+            <div class="seats-row" id="seats-row"></div>
+            <div class="table-wheel-area">
+              <div class="mini-wheel-wrap">
+                <div class="wheel-pointer">▼</div>
+                <div class="wheel mini" id="table-wheel"><div class="wheel-numbers" id="table-wheel-numbers"></div><div class="wheel-hub">♛</div></div>
+                <div class="ball-track" id="table-ball-track"><div class="ball"></div></div>
+              </div>
+              <p class="stage-result" id="table-result" aria-live="polite">SEATS PLACE BETS, THEN SPIN</p>
+            </div>
+            <div class="table-controls">
+              <button class="btn btn-small" id="add-seat">+ ADD SEAT</button>
+              <button class="btn btn-small" id="table-clear">CLEAR BETS</button>
+              <button class="btn btn-small" id="spectate-btn">👁 SPECTATE ROUND</button>
+              <button class="btn btn-primary" id="table-spin">SPIN FOR TABLE <span>↗</span></button>
+            </div>
+            <div class="table-bets" id="table-bets"></div>
+          </div>
+          <aside class="table-chat">
+            <h3>TABLE CHAT</h3>
+            <ul class="chat-log" id="chat-log"></ul>
+            <div class="chat-input-row">
+              <select id="chat-seat" aria-label="Chat as seat"></select>
+              <input id="chat-input" type="text" maxlength="120" placeholder="Say something…" aria-label="Chat message" />
+              <button id="chat-send" aria-label="Send">↗</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- history strip -->
+      <div class="casino-history">
+        <h3>BETTING HISTORY</h3>
+        <ul id="casino-history" class="history-list"><li class="movelist-empty">No bets yet. The tables are waiting.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ECONOMY ============ -->
+  <section class="view" id="view-economy">
+    <div class="view-head">
+      <button class="back-btn" data-view-link="world">← WORLD</button>
+      <div>
+        <h1>Build an Empire</h1>
+        <p>One shared wallet feeds everything: work shifts, harvests, catches, shop trades and six upgradeable income assets. Progress is saved on this device.</p>
+      </div>
+    </div>
+
+    <div class="eco-stats" id="eco-stats">
+      <div><span>WALLET</span><strong id="eco-wallet">1,000 ◉</strong></div>
+      <div><span>NET WORTH</span><strong id="eco-worth">1,000 ◉</strong></div>
+      <div><span>LEVEL</span><strong id="eco-level">1</strong></div>
+      <div><span>XP</span><strong id="eco-xp">0 / 50</strong></div>
+      <div><span>PASSIVE / HR</span><strong id="eco-rate">0 ◉</strong></div>
+    </div>
+
+    <div class="eco-grid">
+      <div class="eco-card" id="work-card">
+        <h3>🛠 WORK SHIFT</h3>
+        <p>Clock in for 100–250 coins and +5 XP. One shift per minute.</p>
+        <button class="btn btn-primary" id="work-btn">START SHIFT</button>
+        <p class="eco-note" id="work-note"></p>
+      </div>
+
+      <div class="eco-card" id="farm-card">
+        <h3>🌾 FARM</h3>
+        <p>Plant seeds, wait 60 seconds, harvest carrots. Needs a shovel.</p>
+        <div class="plots" id="plots"></div>
+        <p class="eco-note" id="farm-note"></p>
+      </div>
+
+      <div class="eco-card" id="fish-card">
+        <h3>🎣 FISHING</h3>
+        <p>Cast a line every 30 seconds. Minnows are common; Golden Koi are not.</p>
+        <button class="btn btn-primary" id="fish-btn">CAST LINE</button>
+        <p class="eco-note" id="fish-note"></p>
+        <div class="catch-log" id="catch-log"></div>
+      </div>
+
+      <div class="eco-card wide" id="assets-card">
+        <div class="assets-head">
+          <h3>🏙 INCOME ASSETS</h3>
+          <button class="btn btn-small btn-collect" id="collect-btn">COLLECT <strong id="collect-amount">0</strong> ◉</button>
+        </div>
+        <p>Properties, businesses and fictional mining rigs pay every hour, up to 24h per collection. Upgrade to level 5.</p>
+        <div class="assets-grid" id="assets-grid"></div>
+      </div>
+
+      <div class="eco-card" id="shop-card">
+        <h3>🛒 SHOP &amp; INVENTORY</h3>
+        <div class="shop-list" id="shop-list"></div>
+        <h3 class="inv-head">INVENTORY</h3>
+        <div class="inv-list" id="inv-list"></div>
+      </div>
+
+      <div class="eco-card" id="leader-card">
+        <h3>🏆 LEADERBOARDS</h3>
+        <div class="seg" id="leader-seg">
+          <button data-board="worth" class="active">NET WORTH</button>
+          <button data-board="level">LEVEL</button>
+          <button data-board="profit">CASINO PROFIT</button>
+        </div>
+        <ol class="leader-list" id="leader-list"></ol>
+        <p class="eco-note">Other residents are simulated world characters — you're the only real player here.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- profile modal -->
+<div class="modal-backdrop" id="profile-modal" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+    <button class="modal-close" id="profile-close" aria-label="Close">×</button>
+    <p class="kicker">PLAYER PROFILE</p>
+    <h2 id="profile-title">Your identity</h2>
+    <div id="profile-summary"></div>
+    <label class="field"><span>DISPLAY NAME</span><input id="profile-name" type="text" maxlength="20" placeholder="Guest" /></label>
+    <label class="field"><span>CHESS EMBLEM · YOUR PORTRAIT IS SET IN PROFILE STUDIO</span><div class="avatar-picker" id="avatar-picker"></div></label>
+    <button class="btn btn-primary" id="profile-save">SAVE PROFILE <span>↗</span></button>
+    <div class="account-block">
+      <p class="kicker">CLOUD ACCOUNT</p>
+      <p class="account-status" id="account-status">LOCAL MODE</p>
+      <div id="account-form">
+        <label class="field"><span>EMAIL</span><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" /></label>
+        <label class="field"><span>PASSWORD</span><input id="auth-pass" type="password" autocomplete="current-password" placeholder="min 6 characters" /></label>
+        <div class="auth-row">
+          <button class="btn btn-primary" id="auth-signin">SIGN IN ↗</button>
+          <button class="btn" id="auth-signup">CREATE ACCOUNT</button>
+        </div>
+      </div>
+      <div id="account-signed" hidden>
+        <button class="btn" id="auth-signout">SIGN OUT</button>
+      </div>
+      <p class="odds-note" id="auth-note">Cloud saves sync your wallet, character and properties across devices, and put you on the live leaderboard. New accounts confirm by email.</p>
+    </div>
+  </section>
+</div>
+
+<!-- settings modal: character + sky + sound -->
+<div class="modal-backdrop" id="settings-modal" hidden>
+  <section class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <button class="modal-close" id="settings-close" aria-label="Close">×</button>
+    <p class="kicker">SETTINGS</p>
+    <h2 id="settings-title">Make it yours</h2>
+
+    <div class="settings-grid">
+      <div class="char-editor">
+        <h3>YOUR CHARACTER</h3>
+        <canvas id="char-preview" width="160" height="200" aria-label="Character preview"></canvas>
+        <div class="char-controls">
+          <label class="field"><span>SKIN</span><div class="swatch-row" id="char-skin"></div></label>
+          <label class="field"><span>HAIR</span><div class="swatch-row" id="char-hair"></div></label>
+          <label class="field"><span>HAIR STYLE</span>
+            <div class="seg" id="char-hairstyle">
+              <button data-style="short">SHORT</button>
+              <button data-style="long">LONG</button>
+              <button data-style="mohawk">MOHAWK</button>
+              <button data-style="bun">BUN</button>
+              <button data-style="none">BALD</button>
+            </div>
+          </label>
+          <label class="field"><span>SHIRT</span><div class="swatch-row" id="char-shirt"></div></label>
+          <label class="field"><span>PANTS</span><div class="swatch-row" id="char-pants"></div></label>
+          <button class="btn btn-small" id="char-random">🎲 RANDOMIZE</button>
+        </div>
+      </div>
+
+      <div class="settings-side">
+        <h3>INTERFACE</h3>
+        <div class="seg" id="interface-themes"><button data-ui-choice="modern">MODERN</button><button data-ui-choice="black">MINIMAL BLACK</button></div>
+        <h3>SKY THEME</h3>
+        <button class="btn" data-theme-choice="day">NORMAL DAY</button>
+        <div class="theme-cards compact">
+          <button class="theme-card tc-starry" data-theme-choice="starry">
+            <span class="tc-sky"><i></i><i></i><i></i></span>
+            <span class="tc-name">STARRY VOID</span>
+            <span class="tc-action">EQUIP SKY ↗</span>
+          </button>
+          <button class="theme-card tc-sakura" data-theme-choice="sakura">
+            <span class="tc-sky"><i></i><i></i><i></i></span>
+            <span class="tc-name">SAKURA</span>
+            <span class="tc-action">EQUIP SKY ↗</span>
+          </button>
+          <button class="theme-card tc-sea" data-theme-choice="sea">
+            <span class="tc-sky"><i></i><i></i><i></i></span>
+            <span class="tc-name">DEEP SEA</span>
+            <span class="tc-action">EQUIP SKY ↗</span>
+          </button>
+        </div>
+        <h3>SOUND</h3>
+        <p class="odds-note">One switch in the top bar mutes everything. Casino ambience has its own toggle inside the casino. Reduced-motion preferences are respected automatically.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+.interior-view { position: relative; padding: 0 !important; height: calc(100dvh - 60px); overflow: hidden; background: #202730; }
+#room-canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; touch-action: none; }
+.room-toolbar { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.room-toolbar strong { color: #e8e3d7; font: 700 13px Inter, sans-serif; letter-spacing: .08em; }
+#room-cameras { display: flex; margin-left: auto; padding: 4px; border-radius: 12px; background: #18212bd9; gap: 4px; }
+#room-cameras button, .room-touch button { border: 1px solid #ffffff25; background: #28353c; color: #d8ddce; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+#room-cameras button.active { background: var(--room-accent, #81b64c); color: #fff; border-color: var(--room-trim, #81b64c); }
+.interior-view #room-action { background: var(--room-accent); color: #fff; border: 1px solid var(--room-trim); }
+.interior-view .room-glass { border-color: var(--room-trim); }
+#view-casino { --primary: #a83750; --primary-ink: #fff1de; --accent: #bc4059; --accent-3: #d6b56f; --glow: #ab31483d; }
+#view-casino .casino-shell { border-color: #987445; background: linear-gradient(135deg, #30252c, #171e24); box-shadow: 0 16px 60px #0005, inset 0 1px #d6b56f33; }
+#view-casino .casino-topbar { background: linear-gradient(90deg, #542432, #28212b); border-bottom: 1px solid #98744566; }
+#view-casino .casino-tabs button.active { background: #a83750; color: #fff1de; }
+#view-casino .casino-wallet strong { color: #d6b56f; }
+.room-help { position: absolute; top: 79px; left: 18px; color: #bfc9c4; font: 12px Inter,sans-serif; pointer-events: none; }
+#room-action { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.room-glass { position: absolute; inset: 110px max(18px, calc((100% - 820px) / 2)) 25px; padding: 28px; overflow-y: auto; border-radius: 18px; border: 1px solid #ffffff35; background: #18222ed2; backdrop-filter: blur(12px); box-shadow: 0 22px 80px #0008; color: #e8e9de; }
+.room-glass h2 { margin: 0 35px 16px 0; font: 800 24px Inter,sans-serif; }
+.room-glass p { font: 14px/1.6 Inter,sans-serif; margin: 10px 0 18px; color: #bccbc9; }
+.room-glass .btn { margin: 5px 8px 5px 0; }
+.room-glass .modal-close { position: sticky; float: right; top: 0; }
+.catalog-card { padding: 18px 0; border-top: 1px solid #ffffff20; }
+.catalog-card h3 { font: 700 18px Inter,sans-serif; }
+.property-previews { display: flex; gap: 12px; }
+.property-preview { width: calc(50% - 6px); height: auto; border-radius: 10px; border: 1px solid #ffffff25; image-rendering: pixelated; }
+.hall-board { display: grid; grid-template: repeat(8, 1fr) / repeat(8, 1fr); width: min(100%, 500px); aspect-ratio: 1; margin: 0 auto; border: 10px solid #593b2c; border-radius: 3px; box-sizing: border-box; outline: 1px solid #c6a45e; box-shadow: 0 12px 32px #0006, 0 0 0 3px #2d201c; }
+.hall-square.legal-target { box-shadow: inset 0 0 0 3px #c6a45e; }
+.hall-square { border: 0; border-radius: 0; background: var(--board-light, #e0ccaa); padding: 0; min-width: 0; min-height: 0; display: grid; place-items: center; cursor: pointer; }
+.hall-square.dark { background: var(--board-dark, #847052); }
+.hall-square.selected { box-shadow: inset 0 0 0 4px #81b64c; }
+.hall-square img { width: 85%; height: 85%; object-fit: contain; image-rendering: pixelated; }
+.hall-square:disabled { opacity: 1; cursor: default; }
+.hall-moves { max-height: 70px; overflow: auto; }
+.room-touch { display: none; position: absolute; bottom: 16px; left: 16px; gap: 6px; }
+.room-touch button { width: 48px; height: 48px; font-size: 20px; touch-action: none; }
+@media (pointer: coarse) { .room-touch { display: flex; } .room-help { display: none; } }
+@media (max-width: 620px) { .room-help { display: none; } .room-touch { display: flex; } .room-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .room-toolbar strong { font-size: 10px; } #room-cameras { margin-left: 0; justify-self: start; padding: 2px; } #room-cameras button { padding: 7px 9px; } #room-training { font-size: 10px; padding: 9px 8px; } .room-glass { top: 130px; padding: 18px; } .property-previews { flex-direction: column; } .property-preview { width: 100%; } }
